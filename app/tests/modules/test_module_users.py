@@ -300,3 +300,5 @@ async def test_get_users_by_messages():
     assert isinstance(response_data["users"], list)
     assert isinstance(response_data["users"][0], dict)
     assert response_data['users'] == expected_result
+
+    os.remove(file_path)
