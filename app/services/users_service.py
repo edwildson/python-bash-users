@@ -4,11 +4,12 @@ This module contains the service layer for the users module.
 
 from fastapi import HTTPException, status, Response
 from app.modules.users import users_module
+from app.schemas.users_schemas import GetUsersResponse, UserSchema
 
 
 async def get_users_by_name(
     filename: str, username: str, order: str, offset: int, limit: int
-) -> Response:
+) -> GetUsersResponse:
     """
     This function returns a list of users based on a file.
 
@@ -24,7 +25,7 @@ async def get_users_by_name(
     )
 
 
-async def get_user_by_size(filename: str, order: str) -> Response:
+async def get_user_by_size(filename: str, order: str) -> UserSchema:
     """
     This function returns the user with the largest or smallest size \
         based on a file.
@@ -43,7 +44,7 @@ async def get_users_by_messages(
     max_messages: int,
     offset: int,
     limit: int
-) -> Response:
+) -> GetUsersResponse:
     """
     This function returns a list of users that are in a range of quantity \
         of messages in the INBOX post.

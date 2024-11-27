@@ -6,10 +6,12 @@ from fastapi import HTTPException, status, UploadFile, Response
 import os
 import json
 
+from app.settings.settings import settings
 from app.utils.utils import check_if_filename_is_allowed
+from app.schemas.files_schemas import GetFilesResponse, PutFileResponse
 
 
-async def get_files(offset: int, limit: int):
+async def get_files(offset: int, limit: int) -> GetFilesResponse:
     """
     This function returns a list of files.
 
@@ -17,8 +19,7 @@ async def get_files(offset: int, limit: int):
     :param limit: Limit of the files.
     :return: List of files.
     """
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    files_directory = os.path.abspath(os.path.join(current_directory, "../../tmp/files"))
+    files_directory = settings.PATH_FILES
 
     files = []
     try:
@@ -27,7 +28,7 @@ async def get_files(offset: int, limit: int):
             if os.path.isfile(file_path):
                 files.append(
                     {
-                        'name': file_name,
+                        'filename': file_name,
                         'size': os.path.getsize(file_path),
                     }
                 )
@@ -36,10 +37,14 @@ async def get_files(offset: int, limit: int):
 
     start = offset
     end = offset + limit
-    return files[start:end]
+    return GetFilesResponse(
+        files=files[start:end],
+        status='success',
+        status_code=status.HTTP_200_OK,
+    )
 
 
-async def create_or_update_file(file: UploadFile) -> Response:
+async def create_or_update_file(file: UploadFile) -> PutFileResponse:
     """
     This function creates a file if it does not exist or updates a file \
         if it exists.
@@ -49,10 +54,7 @@ async def create_or_update_file(file: UploadFile) -> Response:
     """
     file_already_exists = False
 
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    files_directory = os.path.abspath(
-        os.path.join(current_directory, "../../tmp/files")
-    )
+    files_directory = settings.PATH_FILES
 
     try:
         if not check_if_filename_is_allowed(file.filename):
@@ -75,14 +77,9 @@ async def create_or_update_file(file: UploadFile) -> Response:
             file_object.write(file.file.read())
             os.chmod(file_path, 0o775)
 
-        return Response(
-            content=json.dumps({
-                'file': file.filename,
-                'status': 'file updated' if (
-                    file_already_exists
-                ) else 'file created',
-            }),
-            media_type="application/json",
+        return PutFileResponse(
+            message='File updated' if file_already_exists else 'File created',
+            status='success',
             status_code=status.HTTP_201_CREATED if (
                 not file_already_exists
             ) else status.HTTP_204_NO_CONTENT,

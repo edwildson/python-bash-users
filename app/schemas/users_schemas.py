@@ -13,3 +13,5 @@ class GetUsersResponse(BaseModel):
     users: List[UserSchema]
     status: str
     status_code: int
+    total: int
+    page: int

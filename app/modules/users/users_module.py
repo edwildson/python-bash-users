@@ -7,6 +7,7 @@ import json
 
 from app.settings.settings import settings
 from app.utils.utils import handle_users_array_to_dict
+from app.schemas.users_schemas import GetUsersResponse, UserSchema
 
 
 async def get_users_by_name(
@@ -15,7 +16,7 @@ async def get_users_by_name(
     order: str,
     offset: int,
     limit: int
-):
+) -> GetUsersResponse:
     """
     This function returns a list of users based on a file.
 
@@ -33,6 +34,7 @@ async def get_users_by_name(
     try:
         cmd = [script_path, file_path, f"-{order}" if order == "desc" else ""]
 
+        
         result = subprocess.run(
             cmd,
             stdout=subprocess.PIPE,  # Captura a saída padrão
@@ -40,20 +42,18 @@ async def get_users_by_name(
             text=True,               # Interpreta a saída como texto (string)
             check=True               # Lança exceção em caso de erro
         )
-        users_array = result.stdout.splitlines()
 
+        users_array = result.stdout.splitlines()
         users = handle_users_array_to_dict(
             users=users_array, username=username, offset=offset, limit=limit
         )
 
-        return Response(
-            content=json.dumps({
-                'users': users,
-                'total': len(users),
-                'page': (offset + settings.PER_PAGE) / settings.PER_PAGE,
-            }),
-            media_type="application/json",
-            status_code=status.HTTP_200_OK
+        return GetUsersResponse(
+            users=users,
+            status='success',
+            status_code=status.HTTP_200_OK,
+            total=len(users),
+            page=int((offset + settings.PER_PAGE) / settings.PER_PAGE)
         )
     except subprocess.CalledProcessError as e:
         raise HTTPException(
@@ -62,7 +62,7 @@ async def get_users_by_name(
         )
 
 
-async def get_user_by_size(filename: str, order: str):
+async def get_user_by_size(filename: str, order: str) -> UserSchema:
     """
     This function returns the user with the largest or smallest size \
         based on a file.
@@ -90,10 +90,14 @@ async def get_user_by_size(filename: str, order: str):
             users=users_array, offset=0, limit=1
         )
 
-        return Response(
-            content=json.dumps(users[0]) if users else None,
-            media_type="application/json",
-            status_code=status.HTTP_200_OK
+        if not users:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuário não encontrado."
+            )
+
+        return UserSchema(
+            **users[0]
         )
     except subprocess.CalledProcessError as e:
         raise HTTPException(
@@ -109,7 +113,7 @@ async def get_users_by_messages(
     max_messages: int,
     offset: int,
     limit: int
-):
+) -> GetUsersResponse:
     """
     This function returns a list of users that are in a range of quantity \
         of messages in the INBOX post.
@@ -140,14 +144,12 @@ async def get_users_by_messages(
             users=users_array, username=username, offset=offset, limit=limit
         )
 
-        return Response(
-            content=json.dumps({
-                'users': users,
-                'total': len(users),
-                'page': (offset + settings.PER_PAGE) / settings.PER_PAGE,
-            }),
-            media_type="application/json",
-            status_code=status.HTTP_200_OK
+        return GetUsersResponse(
+            users=users,
+            status='success',
+            status_code=status.HTTP_200_OK,
+            total=len(users),
+            page=int((offset + settings.PER_PAGE) / settings.PER_PAGE),
         )
     except subprocess.CalledProcessError as e:
         raise HTTPException(
