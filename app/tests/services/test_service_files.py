@@ -9,7 +9,7 @@ import app.services.files_service as services
 
 
 @pytest.mark.asyncio
-async def test_get_files():
+async def test_get_files(mocked_files_directory):
     files = await services.get_files(0, 10)
 
     assert isinstance(files, schemas.GetFilesResponse)
@@ -19,10 +19,10 @@ async def test_get_files():
 
 
 @pytest.mark.asyncio
-async def test_create_or_update_file_when_not_exists():
+async def test_create_or_update_file_when_not_exists(mocked_files_directory):
     mock_file = Mock(spec=UploadFile)
     mock_file.filename = "testfile"
-    mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT)
+    mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT.encode())
 
     file = await services.create_or_update_file(mock_file)
 
@@ -33,10 +33,10 @@ async def test_create_or_update_file_when_not_exists():
 
 
 @pytest.mark.asyncio
-async def test_create_or_update_file_when_exists():
+async def test_create_or_update_file_when_exists(mocked_files_directory):
     mock_file = Mock(spec=UploadFile)
-    mock_file.filename = "testfile"
-    mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT)
+    mock_file.filename = "testfile_1"
+    mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT.encode())
 
     file = await services.create_or_update_file(mock_file)
 
@@ -47,14 +47,13 @@ async def test_create_or_update_file_when_exists():
 
 
 @pytest.mark.asyncio
-async def test_create_or_update_file_when_filename_is_not_allowed():
+async def test_create_or_update_file_when_filename_is_not_allowed(mocked_files_directory):
     mock_file = Mock(spec=UploadFile)
     mock_file.filename = "test.file"
-    mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT)
+    mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT.encode())
 
-    file = await services.create_or_update_file(mock_file)
+    with pytest.raises(Exception) as e:
+        await services.create_or_update_file(mock_file)
 
-    assert isinstance(file, schemas.PutFileResponse)
-    assert file.message == 'Error creating or updating the file'
-    assert file.status == 'error'
-    assert file.status_code == 400
+        assert str(e) == "400: Filename contains invalid characters"
+        assert e.value.status == 400

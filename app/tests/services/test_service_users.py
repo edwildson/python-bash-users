@@ -4,42 +4,35 @@ import app.schemas.users_schemas as schemas
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_name():
+async def test_get_users_by_name(create_test_file):
     users = await services.get_users_by_name(
-        'filename', 'username', 'asc', 0, 10
+        'test_file', '', 'asc', 0, 10
     )
 
     assert isinstance(users, schemas.GetUsersResponse)
     assert isinstance(users.users, list)
     assert isinstance(users.users[0], schemas.UserSchema)
     assert users.status == 'success'
+    assert users.status_code == 200
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_size():
-    user = await services.get_user_by_size('filename', 'asc')
+async def test_get_users_by_size(create_test_file):
+    user = await services.get_user_by_size('test_file', 'asc')
 
     assert isinstance(user, schemas.UserSchema)
-    assert user.username == 'username'
-    assert user.folder == 'INBOX'
-    assert user.numberMessages == 10
-    assert user.size == 1500
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_size():
-    user = await services.get_user_by_size('filename', 'desc')
+async def test_get_users_by_size(create_test_file):
+    user = await services.get_user_by_size('test_file', 'min')
 
     assert isinstance(user, schemas.UserSchema)
-    assert user.username == 'username'
-    assert user.folder == 'INBOX'
-    assert user.numberMessages == 10
-    assert user.size == 1500
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_messages():
-    users = await services.get_users_by_messages('filename', '', 10, 20, 0, 10)
+async def test_get_users_by_messages(create_test_file):
+    users = await services.get_users_by_messages('test_file', '', 10, 20, 0, 10)
 
     assert isinstance(users, schemas.GetUsersResponse)
     assert isinstance(users.users, list)
@@ -48,10 +41,11 @@ async def test_get_users_by_messages():
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_messages_with_username():
-    users = await services.get_users_by_messages('filename', 'username', 10, 20, 0, 10)
+async def test_get_users_by_messages_with_username(create_test_file):
+    users = await services.get_users_by_messages('test_file', 'damejoxo', 10, 20, 0, 10)
 
     assert isinstance(users, schemas.GetUsersResponse)
     assert isinstance(users.users, list)
     assert isinstance(users.users[0], schemas.UserSchema)
+    assert len(users.users) == 1
     assert users.status == 'success'

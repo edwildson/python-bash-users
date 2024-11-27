@@ -1,6 +1,7 @@
 import pytest
 import json
 import subprocess
+import os
 
 from unittest.mock import patch
 from fastapi import status, HTTPException
@@ -8,25 +9,18 @@ from fastapi import status, HTTPException
 from app.modules.users import users_module
 from app.settings import settings
 from app.schemas.files_schemas import MOCK_FILE_CONTENT
-import os
+from app.schemas.users_schemas import UserSchema, GetUsersResponse
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_name_asc_success():
-    files_dir = settings.PATH_FILES
-
-    filename = "test_file"
-    file_path = f"{files_dir}/{filename}"
-    file_content = MOCK_FILE_CONTENT
-    with open(file_path, "w") as f:
-        f.write(file_content)
-
+async def test_get_users_by_name_asc_success(create_test_file):
+    filename = 'test_file'
     username = ""
     order = "asc"
     offset = 0
     limit = 10
 
-    expected_result = [
+    expected_result = [UserSchema(**result) for result in [
         {"username": "alice.wonderland@yahoo.com", "folder": "inbox", "numberMessages": 3210, "size": 987654},
         {"username": "blue.ocean@marine.life", "folder": "inbox", "numberMessages": 2222, "size": 987123},
         {"username": "bob.builder@hotmail.com", "folder": "inbox", "numberMessages": 1234, "size": 567890},
@@ -37,7 +31,7 @@ async def test_get_users_by_name_asc_success():
         {"username": "gamer@play.fun", "folder": "inbox", "numberMessages": 6666, "size": 1111333},
         {"username": "green.planet@eco.org", "folder": "inbox", "numberMessages": 1111, "size": 444555},
         {"username": "jane.doe@example.com", "folder": "inbox", "numberMessages": 123, "size": 124567},
-    ]  # noqa
+    ]]
 
     # Executa a função
     response = await users_module.get_users_by_name(filename, username, order, offset, limit)
@@ -45,32 +39,21 @@ async def test_get_users_by_name_asc_success():
     # Verifica a resposta
     assert response.status_code == status.HTTP_200_OK
 
-    response_data = json.loads(response.body.decode("utf-8"))
-
-    assert response_data["users"] == expected_result
-    assert response_data["total"] == len(expected_result)
-    assert response_data["page"] == 1
-
-    os.remove(file_path)
+    assert response.users == expected_result
+    assert response.total == len(expected_result)
+    assert response.page == 1
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_name_desc_success():
+async def test_get_users_by_name_desc_success(create_test_file):
     # Configura os diretórios temporários para o teste
-    files_dir = settings.PATH_FILES
-
-    filename = "test_file"
-    file_path = f"{files_dir}/{filename}"
-    file_content = MOCK_FILE_CONTENT
-    with open(file_path, "w") as f:
-        f.write(file_content)
-
+    filename = 'test_file'
     username = ""
     order = "desc"
     offset = 0
     limit = 10
 
-    expected_result = [
+    expected_result = [UserSchema(**result) for result in [
         {"username": "yyfdinny@uol.com.br", "folder": "inbox", "numberMessages": 5000, "size": 11134606},
         {"username": "vx.qka@uol.com.br", "folder": "inbox", "numberMessages": 1042150, "size": 11113043},
         {"username": "valley.low@earth.net", "folder": "inbox", "numberMessages": 4321, "size": 654321},
@@ -81,7 +64,7 @@ async def test_get_users_by_name_desc_success():
         {"username": "robotic.future@ai.tech", "folder": "inbox", "numberMessages": 4444, "size": 1000001},
         {"username": "random.user2@test.com", "folder": "inbox", "numberMessages": 7890, "size": 1444555},
         {"username": "random.user1@test.com", "folder": "inbox", "numberMessages": 456, "size": 222333},
-    ]  # noqa
+    ]]  # noqa
 
     # Executa a função
     response = await users_module.get_users_by_name(filename, username, order, offset, limit)
@@ -89,13 +72,9 @@ async def test_get_users_by_name_desc_success():
     # Verifica a resposta
     assert response.status_code == status.HTTP_200_OK
 
-    response_data = json.loads(response.body.decode("utf-8"))
-
-    assert response_data["users"] == expected_result
-    assert response_data["total"] == len(expected_result)
-    assert response_data["page"] == 1
-
-    os.remove(file_path)
+    assert response.users == expected_result
+    assert response.total == len(expected_result)
+    assert response.page == 1
 
 # @pytest.mark.asyncio
 # async def test_get_users_by_name_asc_success():
@@ -211,69 +190,48 @@ async def test_get_users_by_name_script_error():
 
 
 @pytest.mark.asyncio
-async def test_get_user_by_size_max_success():
-    files_dir = settings.PATH_FILES
-
+async def test_get_user_by_size_max_success(create_test_file):
     filename = "test_file"
-    file_path = f"{files_dir}/{filename}"
-    file_content = MOCK_FILE_CONTENT
-    with open(file_path, "w") as f:
-        f.write(file_content)
 
-    order = "asc"
+    order = "max"
 
-    expected_result = {"username": "rainbow.colors@pride.com", "folder": "inbox", "numberMessages": 3456, "size": 900888888}  # noqa
+    expected_result = UserSchema(**{"username": "rainbow.colors@pride.com", "folder": "inbox", "numberMessages": 3456, "size": 900888888})  # noqa
 
     # Executa a função
     response = await users_module.get_user_by_size(filename, order)
 
-    # Verifica a resposta
-    assert response.status_code == status.HTTP_200_OK
-
-    response_data = json.loads(response.body.decode("utf-8"))
-
-    assert response_data == expected_result
-
-    os.remove(file_path)
+    assert response == expected_result
 
 
 @pytest.mark.asyncio
-async def test_get_user_by_size_min_success():
-    files_dir = settings.PATH_FILES
-
+async def test_get_user_by_size_min_success(create_test_file):
     filename = "test_file"
-    file_path = f"{files_dir}/{filename}"
-    file_content = MOCK_FILE_CONTENT
-    with open(file_path, "w") as f:
-        f.write(file_content)
 
     order = "min"
 
-    expected_result = {"username": "tiny.human@bigworld.org", "folder": "inbox", "numberMessages": 3333, "size": 111222}  # noqa
+    expected_result = UserSchema(**{"username": "tiny.human@bigworld.org", "folder": "inbox", "numberMessages": 3333, "size": 111222})  # noqa
 
-    # Executa a função
     response = await users_module.get_user_by_size(filename, order)
 
-    # Verifica a resposta
-    assert response.status_code == status.HTTP_200_OK
-
-    response_data = json.loads(response.body.decode("utf-8"))
-
-    assert response_data == expected_result
-
-    os.remove(file_path)
+    assert response == expected_result
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_messages():
-    # Configura os diretórios temporários para o teste
-    files_dir = settings.PATH_FILES
-
+async def test_get_user_by_size_not_found(create_test_empty_file):
     filename = "test_file"
-    file_path = f"{files_dir}/{filename}"
-    file_content = MOCK_FILE_CONTENT
-    with open(file_path, "w") as f:
-        f.write(file_content)
+
+    order = "max"
+
+    with pytest.raises(HTTPException) as exc_info:
+        await users_module.get_user_by_size(filename, order)
+
+        assert str(exc_info) == "404: Usuário não encontrado."
+        assert exc_info.value.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_users_by_messages(create_test_file):
+    filename = "test_file"
 
     username = ""
     offset = 0
@@ -281,12 +239,12 @@ async def test_get_users_by_messages():
     min_messages = 111
     max_messages = 678
 
-    expected_result = [
+    expected_result = [UserSchema(**result) for result in [
         {"username": "jane.doe@example.com", "folder": "inbox", "numberMessages": 123, "size": 124567},
         {"username": "random.user1@test.com", "folder": "inbox", "numberMessages": 456, "size": 222333},
         {"username": "test.email+alex@foo.com", "folder": "inbox", "numberMessages": 111, "size": 123321},
         {"username": "cool.guy@random.net", "folder": "inbox", "numberMessages": 678, "size": 345678}
-    ]  # noqa
+    ]]  # noqa
 
     # Executa a função
     users = await users_module.get_users_by_messages(
@@ -294,11 +252,6 @@ async def test_get_users_by_messages():
     )  # noqa
 
     assert users.status_code == 200
-
-    response_data = json.loads(users.body.decode("utf-8"))
-
-    assert isinstance(response_data["users"], list)
-    assert isinstance(response_data["users"][0], dict)
-    assert response_data['users'] == expected_result
-
-    os.remove(file_path)
+    assert isinstance(users.users, list)
+    assert isinstance(users.users[0], UserSchema)
+    assert users.users == expected_result
