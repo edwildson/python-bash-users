@@ -58,7 +58,7 @@ async def get_users_by_name(
     except subprocess.CalledProcessError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error executing script: {e.stderr}"
+            detail=f"Error executing script: {str(e)}"
         )
 
 
@@ -102,7 +102,7 @@ async def get_user_by_size(filename: str, order: str) -> UserSchema:
     except subprocess.CalledProcessError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error executing script: {e.stderr}"
+            detail=f"Error executing script: {str(e)}"
         )
 
 
@@ -154,5 +154,5 @@ async def get_users_by_messages(
     except subprocess.CalledProcessError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error executing script: {e.stderr}"
+            detail=f"Error executing script: {str(e)}"
         )

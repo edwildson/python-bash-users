@@ -168,7 +168,6 @@ async def test_get_users_by_name_script_error():
     offset = 0
     limit = 10
 
-    # Mock settings
     mock_path_files = "/mock/path/files"
     mock_path_scripts = "/mock/path/scripts"
 
@@ -178,7 +177,7 @@ async def test_get_users_by_name_script_error():
 
         # Simula erro no script
         mock_run.side_effect = subprocess.CalledProcessError(
-            returncode=1, cmd="mocked_cmd", stderr="Script error"
+            returncode=1, cmd="mocked_cmd filename", stderr="Script error"
         )
 
         # Executa a função sob teste e verifica a exceção
@@ -186,7 +185,7 @@ async def test_get_users_by_name_script_error():
             await users_module.get_users_by_name(filename, username, order, offset, limit)
 
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "Script error" in exc_info.value.detail
+        assert str(exc_info.value.detail) == "Error executing script: Command 'mocked_cmd filename' returned non-zero exit status 1."
 
 
 @pytest.mark.asyncio
@@ -225,8 +224,8 @@ async def test_get_user_by_size_not_found(create_test_empty_file):
     with pytest.raises(HTTPException) as exc_info:
         await users_module.get_user_by_size(filename, order)
 
-        assert str(exc_info) == "404: Usuário não encontrado."
-        assert exc_info.value.status_code == 404
+    assert str(exc_info.value) == "404: Usuário não encontrado."
+    assert exc_info.value.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -255,3 +254,41 @@ async def test_get_users_by_messages(create_test_file):
     assert isinstance(users.users, list)
     assert isinstance(users.users[0], UserSchema)
     assert users.users == expected_result
+
+
+
+@pytest.mark.asyncio
+async def test_get_users_by_messages_error(create_test_file):
+    filename = "test_file"
+
+    username = ""
+    offset = 0
+    limit = 10
+    min_messages = 111
+    max_messages = 678
+
+    expected_result = [UserSchema(**result) for result in [
+        {"username": "jane.doe@example.com", "folder": "inbox", "numberMessages": 123, "size": 124567},
+        {"username": "random.user1@test.com", "folder": "inbox", "numberMessages": 456, "size": 222333},
+        {"username": "test.email+alex@foo.com", "folder": "inbox", "numberMessages": 111, "size": 123321},
+        {"username": "cool.guy@random.net", "folder": "inbox", "numberMessages": 678, "size": 345678}
+    ]]  # noqa
+
+    mock_path_files = "/mock/path/files"
+    mock_path_scripts = "/mock/path/scripts"
+
+    with patch("app.settings.settings.settings.PATH_FILES", mock_path_files), \
+         patch("app.settings.settings.settings.PATH_SCRIPTS", mock_path_scripts), \
+         patch("subprocess.run") as mock_run:
+
+        mock_run.side_effect = subprocess.CalledProcessError(
+            returncode=1, cmd="mocked_cmd filename", stderr="Script error"
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            await users_module.get_users_by_messages(
+                filename, '', min_messages, max_messages, offset, limit
+            )  # noqa
+
+        assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert str(exc_info.value.detail) == "Error executing script: Command 'mocked_cmd filename' returned non-zero exit status 1."

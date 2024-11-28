@@ -6,9 +6,10 @@ This module contains the service layer for the files module.
 
 from fastapi import HTTPException, status, UploadFile, Response
 from app.modules.files import files_module
+from app.schemas.files_schemas import GetFilesResponse, PutFileResponse
 
 
-async def get_files(offset: int, limit: int):
+async def get_files(offset: int, limit: int) -> GetFilesResponse:
     """
     This function returns a list of files.
 
@@ -19,7 +20,7 @@ async def get_files(offset: int, limit: int):
     return await files_module.get_files(offset, limit)
 
 
-async def create_or_update_file(file: UploadFile) -> Response:
+async def create_or_update_file(file: UploadFile) -> PutFileResponse:
     """
     This function creates a file if it does not exist or updates a file \
         if it exists.

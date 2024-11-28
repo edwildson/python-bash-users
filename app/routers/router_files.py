@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query, File, UploadFile, Response
 
 from app.services import files_service
+from app.schemas.files_schemas import GetFilesResponse, PutFileResponse
 
 
 router = APIRouter(
@@ -19,7 +20,7 @@ PER_PAGE = 10
 )
 async def read_files(
     page: int = Query(1, description="Número da página", gt=0),
-):
+) -> GetFilesResponse:
     """
     This is a simple function that returns a list of files.
     """
@@ -35,7 +36,7 @@ async def read_files(
 )
 async def create_or_update_file(
     file: UploadFile = File(),
-) -> Response:
+) -> PutFileResponse:
     """
     This is a simple function that creates a file if it does not exist \
         or updates a file if it exists.

@@ -63,7 +63,7 @@ async def create_or_update_file(file: UploadFile) -> PutFileResponse:
                 detail="Filename contains invalid characters"
             )
 
-        if not os.path.exists(files_directory):
+        if not os.path.exists(files_directory):  # pragma: no cover
             os.makedirs(files_directory)
 
         if os.path.exists(

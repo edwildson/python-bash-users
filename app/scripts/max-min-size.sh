@@ -33,10 +33,5 @@ else
 fi
 
 # Exibir o resultado
-if [ -n "$result" ]; then
-    echo "$result"
-    exit 0
-else
-    echo "Erro: Não foi possível processar o arquivo."
-    exit 1
-fi
+echo "$result"
+exit 0

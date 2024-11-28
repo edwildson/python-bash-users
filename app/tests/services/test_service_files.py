@@ -55,5 +55,5 @@ async def test_create_or_update_file_when_filename_is_not_allowed(mocked_files_d
     with pytest.raises(Exception) as e:
         await services.create_or_update_file(mock_file)
 
-        assert str(e) == "400: Filename contains invalid characters"
-        assert e.value.status == 400
+    assert str(e.value.detail) == "400: Filename contains invalid characters"
+    assert e.value.status_code == 400

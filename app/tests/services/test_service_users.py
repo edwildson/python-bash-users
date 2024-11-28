@@ -24,10 +24,18 @@ async def test_get_users_by_size(create_test_file):
 
 
 @pytest.mark.asyncio
-async def test_get_users_by_size(create_test_file):
+async def test_get_users_by_size_min(create_test_file):
     user = await services.get_user_by_size('test_file', 'min')
 
     assert isinstance(user, schemas.UserSchema)
+
+
+@pytest.mark.asyncio
+async def test_get_users_by_size_error():
+    with pytest.raises(Exception) as e:
+        await services.get_user_by_size('test_file', 'min')
+
+    assert str(e.value) == "500: Error executing script: Command '['/http/app/scripts/max-min-size.sh', '/http/app/tmp/files/test_file', '-min']' returned non-zero exit status 1."  # noqa
 
 
 @pytest.mark.asyncio

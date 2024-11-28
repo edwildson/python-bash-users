@@ -15,7 +15,7 @@ def mocked_files_directory():
         os.makedirs(mocked_path_files)
 
     for i in range(10):
-        with open(os.path.join(mocked_path_files, f"testfile_{i}"), 'w') as f:
+        with open(os.path.join(mocked_path_files, f"testfile_{i}"), '+w') as f:
             f.write(f"Content of test file {i}")
 
     with patch('app.settings.settings.settings.PATH_FILES', mocked_path_files):

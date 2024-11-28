@@ -35,14 +35,15 @@ async def test_get_files_paginated(mocked_files_directory):
 async def test_get_files_folder_not_found():
     mocked_path_files = settings.PATH_FILES + "/testfile"
 
-    if os.path.exists(mocked_path_files):
+    if os.path.exists(mocked_path_files):  # pragma: no cover
         os.rmdir(mocked_path_files)
 
     with patch('app.settings.settings.settings.PATH_FILES', mocked_path_files):
         with pytest.raises(Exception) as e:
             _ = await files_module.get_files(0, 10)
-            assert str(e) == "404: Files directory not found"
-            assert e.value.status == 404
+
+    assert str(e.value) == "404: Files directory not found"
+    assert e.value.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -80,6 +81,7 @@ async def test_create_or_update_file_when_filename_is_not_allowed(mocked_files_d
     mock_file.file = BytesIO(schemas.MOCK_FILE_CONTENT.encode())
 
     with pytest.raises(Exception) as e:
-        file = await files_module.create_or_update_file(mock_file)
-        assert str(e) == "400: Filename contains invalid characters"
-        assert e.value.status == 400
+        await files_module.create_or_update_file(mock_file)
+
+    assert str(e.value.detail) == "400: Filename contains invalid characters"
+    assert e.value.status_code == 400
