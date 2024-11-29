@@ -5,11 +5,11 @@ FROM python:3.12.7-alpine3.19
 # Defina o diretório de trabalho
 ENV PYTHONPATH="/http"
 WORKDIR /http
-RUN pwd
-RUN cd /http
 
 # Adiciona o bash ao container
 RUN apk add --no-cache bash
+
+SHELL ["/bin/bash", "-c"]
 
 # Copie os arquivos de requisitos
 COPY requirements.txt .
@@ -19,10 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie o código da aplicação
 COPY . .
-
-COPY .env.example .env
-
-RUN ls -la
 
 # Certifique-se de que o diretório tem permissões corretas
 RUN mkdir -p ./app/tmp/files && \
