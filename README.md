@@ -147,6 +147,8 @@ curl -X 'GET' \
 O projeto possui 100% de cobertura de testes. Para rodar os testes, execute o seguinte comando:
 
 ```bash
+docker compose exec fastapi bash
+cd app
 coverage run -m pytest tests && coverage html --title="Cobertura de testes"
 ```
 
