@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt 1 ]  || [ $# -gt 2 ]; then
-    echo "Error: Arquivo não passado por parâmetro.
+    echo "Arquivo não passado por parâmetro.
 Para executar o script, utilize o seguinte comando:
 $0 <caminho do arquivo> [-min]
 "
@@ -12,7 +12,7 @@ file=$1
 flag=$2
 
 if [ ! -f "$file" ]; then
-    echo "Erro: Arquivo '$file' não encontrado."
+    echo "Arquivo '$file' não encontrado."
     exit 1
 fi
 
@@ -23,7 +23,7 @@ if [[ -n "$flag" ]] && [[ "$flag" == -* ]]; then
         result=$(awk '{size = substr($0, length($0) - 8, 9); if (min_size == "" || size < min_size) { min_size = size; line = $0 }} END {print line}' "$file")
         mode="menor"
     else
-        echo "Erro: Flag desconhecida '$flag'. Use apenas '-min' para buscar o menor size."
+        echo "Flag desconhecida '$flag'. Use apenas '-min' para buscar o menor size."
         exit 1
     fi
 else

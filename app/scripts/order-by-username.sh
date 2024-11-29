@@ -2,7 +2,7 @@
 
 # Verificar se o número correto de argumentos foi passado
 if [ $# -lt 1 ] || [ $# -gt 2 ]; then
-    echo "Error: Arquivo não passado por parâmetro.
+    echo "Arquivo não passado por parâmetro.
 Para executar o script, utilize o seguinte comando:
 $0 <caminho do arquivo> [-desc]
 "
@@ -15,7 +15,7 @@ flag=$2
 
 # Verificar se o arquivo existe
 if [ ! -f "$file" ]; then
-    echo "Erro: Arquivo '$file' não encontrado."
+    echo "Arquivo '$file' não encontrado."
     exit 1
 fi
 
@@ -27,7 +27,7 @@ elif [ "$flag" == "-desc" ]; then
     # Ordenação decrescente
     result=$(sort -rk1,1 "$file")
 else
-    echo "Erro: Flag desconhecida '$flag'. Use '-desc' para ordem decrescente ou nenhuma flag para ordem crescente."
+    echo "Flag desconhecida '$flag'. Use '-desc' para ordem decrescente ou nenhuma flag para ordem crescente."
     exit 1
 fi
 

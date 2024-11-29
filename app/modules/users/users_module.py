@@ -34,7 +34,6 @@ async def get_users_by_name(
     try:
         cmd = [script_path, file_path, f"-{order}" if order == "desc" else ""]
 
-        
         result = subprocess.run(
             cmd,
             stdout=subprocess.PIPE,  # Captura a saída padrão
@@ -58,7 +57,7 @@ async def get_users_by_name(
     except subprocess.CalledProcessError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error executing script: {str(e)}"
+            detail=f"Error executing script: {str(e.stdout)}"
         )
 
 
@@ -102,7 +101,7 @@ async def get_user_by_size(filename: str, order: str) -> UserSchema:
     except subprocess.CalledProcessError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error executing script: {str(e)}"
+            detail=f"Error executing script: {str(e.stdout)}"
         )
 
 
@@ -154,5 +153,5 @@ async def get_users_by_messages(
     except subprocess.CalledProcessError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error executing script: {str(e)}"
+            detail=f"Error executing script: {str(e.stdout)}"
         )

@@ -5,9 +5,9 @@ Este é o projeto desenvolvido por Eddie. Este projeto tem como objetivo demonst
 ## Estrutura do Projeto
 
 - `README`: Este arquivo de documentação.
-- `Dockerfile`: Arquivo de configuração para criar uma imagem Docker do projeto.
+- `app/Dockerfile`: Arquivo de configuração para criar uma imagem Docker do projeto.
 - `docker-compose.yml`: Arquivo de configuração para orquestrar os serviços Docker.
-- `requirements.txt`: Arquivo de dependências do projeto.
+- `app/requirements.txt`: Arquivo de dependências do projeto.
 
 - `app/`: Diretório com o código fonte da aplicação.
 - `app/main.py`: Arquivo principal da aplicação.
@@ -32,7 +32,7 @@ git clone https://github.com/edwildson/python-bash-users
 ```
 
 ### Configuração
-Para configurar o projeto, você precisa criar um arquivo `.env` na raiz do projeto com base no `.env.example`.
+Para configurar o projeto, primeiro você precisa criar um arquivo `.env` na raiz do projeto (dentro pasta app) com base no `.env.example`.
 ```bash	
 cp .env.example .env
 ```
@@ -40,7 +40,7 @@ cp .env.example .env
 ### Requisitos
 Para rodar o projeto, você precisa ter o Docker e o Docker Compose instalados em sua máquina.
 
-Para instalar as dependências do projeto, execute o seguinte comando:
+Para instalar as dependências do projeto, execute o seguinte comando na pasta acima da pasta `app` onde se encontra o arquivo `docker-compose.yml`:
 ```bash
 docker-compose up --build
 ```
@@ -49,6 +49,8 @@ Após isso, a aplicação estará disponível em `http://localhost:8000`.
 Para acessar a documentação da API, acesse `http://localhost:8000/docs` ou `http://localhost:8000/redoc`.
 
 ## Utilização da API
+
+Para testar a API, para uma maior comodidade, você pode utilizar o arquivo input(./app/input) que contém um exemplo de arquivo de entrada e usar o endpoint http://localhost:8000/docs para enviar o arquivo e realizar as consultas.
 
 ### Arquivos
 

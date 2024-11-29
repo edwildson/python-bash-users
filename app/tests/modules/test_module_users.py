@@ -177,7 +177,8 @@ async def test_get_users_by_name_script_error():
 
         # Simula erro no script
         mock_run.side_effect = subprocess.CalledProcessError(
-            returncode=1, cmd="mocked_cmd filename", stderr="Script error"
+            returncode=1, cmd="mocked_cmd filename", stderr="Script error",
+            output="Arquivo 'input' não encontrado."
         )
 
         # Executa a função sob teste e verifica a exceção
@@ -185,7 +186,7 @@ async def test_get_users_by_name_script_error():
             await users_module.get_users_by_name(filename, username, order, offset, limit)
 
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert str(exc_info.value.detail) == "Error executing script: Command 'mocked_cmd filename' returned non-zero exit status 1."
+        assert str(exc_info.value.detail) == "Error executing script: Arquivo 'input' não encontrado."
 
 
 @pytest.mark.asyncio
@@ -282,7 +283,8 @@ async def test_get_users_by_messages_error(create_test_file):
          patch("subprocess.run") as mock_run:
 
         mock_run.side_effect = subprocess.CalledProcessError(
-            returncode=1, cmd="mocked_cmd filename", stderr="Script error"
+            returncode=1, cmd="mocked_cmd filename", stderr="Script error",
+            output="Arquivo 'input' não encontrado."
         )
 
         with pytest.raises(HTTPException) as exc_info:
@@ -291,4 +293,4 @@ async def test_get_users_by_messages_error(create_test_file):
             )  # noqa
 
         assert exc_info.value.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert str(exc_info.value.detail) == "Error executing script: Command 'mocked_cmd filename' returned non-zero exit status 1."
+        assert str(exc_info.value.detail) == "Error executing script: Arquivo 'input' não encontrado."
