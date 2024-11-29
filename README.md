@@ -1,6 +1,6 @@
 # API Shell Script (Linux bash)
 
-Este é o projeto desenvolvido por Eddie. Este projeto tem como objetivo demonstrar conhecimento em criação de API's utilizando a linguagem Python e processando arquivos usando shell script (Bash).
+Este projeto tem como objetivo demonstrar conhecimento em criação de API's utilizando a linguagem Python e processando arquivos usando shell script (Bash).
 
 ## Estrutura do Projeto
 
