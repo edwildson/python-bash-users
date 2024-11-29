@@ -2,6 +2,18 @@
 
 Este projeto tem como objetivo demonstrar conhecimento em criação de API's utilizando a linguagem Python e processando arquivos usando shell script (Bash).
 
+Foram utilizados as seguintes tecnologias:
+- [FastAPI](https://fastapi.tiangolo.com/): Framework web assíncrono para Python.
+- [Docker](https://www.docker.com/): Plataforma para desenvolvimento, envio e execução de aplicativos em contêineres.
+- [Docker Compose](https://docs.docker.com/compose/): Ferramenta para definir e executar aplicativos Docker em vários contêineres.
+- [Pydantic](https://pydantic-docs.helpmanual.io/): Biblioteca para validação de dados.
+- [Uvicorn](https://www.uvicorn.org/): Servidor ASGI de alto desempenho.
+- [Shell Script](https://www.shellscript.sh/): Linguagem de script de shell.
+- [Python](https://www.python.org/): Linguagem de programação interpretada de alto nível.
+- [Pytest](https://docs.pytest.org/): Framework de teste para Python.
+- [Coverage](https://coverage.readthedocs.io/): Ferramenta para medir a cobertura de código de programas Python.
+
+
 ## Estrutura do Projeto
 
 - `README`: Este arquivo de documentação.
@@ -50,7 +62,7 @@ Para acessar a documentação da API, acesse `http://localhost:8000/docs` ou `ht
 
 ## Utilização da API
 
-Para testar a API, para uma maior comodidade, você pode utilizar o arquivo input(./app/input) que contém um exemplo de arquivo de entrada e usar o endpoint http://localhost:8000/docs para enviar o arquivo e realizar as consultas.
+Para testar a API, para uma maior comodidade, você pode utilizar o arquivo [input](./app/input) que contém um exemplo de arquivo de entrada e usar o endpoint http://localhost:8000/docs para enviar o arquivo e realizar as consultas.
 
 ### Arquivos
 
